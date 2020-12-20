@@ -1,4 +1,4 @@
-package com.danisoft.tplate.api;
+package com.tplate;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

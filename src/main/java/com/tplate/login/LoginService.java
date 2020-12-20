@@ -1,12 +1,13 @@
 package com.tplate.login;
 
+import com.tplate.user.UserEntity;
 import com.tplate.user.UserRepository;
 import com.google.common.base.Strings;
-import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -16,7 +17,10 @@ import java.util.Objects;
 public class LoginService {
 
     @Autowired
-    private UserRepository userRepository;
+    UserRepository userRepository;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     public ResponseEntity loguear(CredentialDto credentialDto) {
         try {
@@ -41,8 +45,14 @@ public class LoginService {
         if (Objects.isNull(credentialDto) || Strings.isNullOrEmpty(credentialDto.getUsername()) || Strings.isNullOrEmpty(credentialDto.getPassword())){
             throw new CredentialsException("El username y password son requeridos.");
         }
-        if (!userRepository.existsByUsernameAndPassword(credentialDto.getUsername(), credentialDto.getPassword())){
-            throw new CredentialsException("Credenciales invalidas.");
+
+        if (!userRepository.existsByUsername(credentialDto.getUsername())){
+            throw new CredentialsException();
+        }else{
+            UserEntity userEntity = userRepository.getOne(credentialDto.getUsername());
+            if (!passwordEncoder.matches(credentialDto.getPassword(), userEntity.getPassword())){
+                throw new CredentialsException();
+            }
         }
     }
 }

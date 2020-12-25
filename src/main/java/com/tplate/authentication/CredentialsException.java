@@ -1,4 +1,4 @@
-package com.tplate.login;
+package com.tplate.authentication;
 
 public class CredentialsException extends Exception {
     public CredentialsException(String s) {

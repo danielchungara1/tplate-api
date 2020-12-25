@@ -1,4 +1,4 @@
-package com.tplate.login;
+package com.tplate.authentication;
 
 import lombok.Data;
 import lombok.ToString;

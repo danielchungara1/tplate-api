@@ -1,4 +1,4 @@
-package com.tplate.login;
+package com.tplate.authentication;
 
 import com.tplate.user.UserEntity;
 import com.tplate.user.UserRepository;
@@ -22,11 +22,14 @@ public class LoginService {
     @Autowired
     PasswordEncoder passwordEncoder;
 
+    @Autowired
+    JWTAuthenticationService jwtAuthenticationService;
+
     public ResponseEntity loguear(CredentialDto credentialDto) {
         try {
             this.validateCredentials(credentialDto);
-            String token = this.generateJWT(credentialDto);
-            log.info("Login exitoso. {}", credentialDto.toString() );
+            String token = this.jwtAuthenticationService.generateAccessToken(credentialDto.getUsername());
+            log.info("Login exitoso. {}", credentialDto.getUsername() );
             return new ResponseEntity(token, HttpStatus.OK);
         }catch (CredentialsException e){
             log.error("Error en las credenciales. {}", e.getMessage());
@@ -35,10 +38,6 @@ public class LoginService {
             log.error("Error inesperado. {}, {}", e.getMessage(), e.getClass().getCanonicalName());
             return new ResponseEntity("Error inesperado.", HttpStatus.CONFLICT);
         }
-    }
-
-    private String generateJWT(CredentialDto credentialDto) {
-        return "Token";
     }
 
     private void validateCredentials(CredentialDto credentialDto) throws CredentialsException{

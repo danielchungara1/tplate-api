@@ -1,5 +1,6 @@
 package com.tplate.user;
 
+import com.tplate.rol.RolEntity;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,39 +11,22 @@ import java.util.Collection;
 
 @Entity
 @Data
-@Table(name = "users")
-public class UserEntity implements UserDetails{
+@Table(name = "USERS")
+public class UserEntity {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
-    @Column(name = "username")
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @Column(name = "ID")
+    private Long ID;
+
+    @Column(name = "USERNAME")
     private String username;
 
-    @Column(name = "password")
+    @Column(name = "PASSWORD")
     private String password;
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
-    }
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="ROL_ID")
+    private RolEntity rol;
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return false;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return false;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return false;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return false;
-    }
 }

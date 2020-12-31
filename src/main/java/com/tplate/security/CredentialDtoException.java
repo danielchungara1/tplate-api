@@ -1,4 +1,4 @@
-package com.tplate.authentication;
+package com.tplate.security;
 
 public class CredentialDtoException extends Exception {
     public CredentialDtoException(String s) {

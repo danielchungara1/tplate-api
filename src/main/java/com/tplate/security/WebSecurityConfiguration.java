@@ -1,52 +1,60 @@
-package com.tplate.authorization;
+package com.tplate.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-@EnableWebSecurity
-public class SecurityManagerConfig extends WebSecurityConfigurerAdapter {
+@Configuration
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    JwtUserDetailsService jwtUserDetailsService;
+    JwtAuthorizationFilter jwtAuthorizationFilter;
+
+    @Autowired
+    private JwtUserDetailsService jwtUserDetailsService;
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         // configure AuthenticationManager so that it knows from where to load
         // user for matching credentials
         // Use BCryptPasswordEncoder
-        auth.userDetailsService(jwtUserDetailsService).passwordEncoder(encoder());
+        auth.userDetailsService(jwtUserDetailsService).passwordEncoder(passwordEncoder());
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        //Enable cross origin all controllers
-        http = http.cors().and().csrf().disable()
-                .addFilterAfter(new JWTAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+        // We don't need CSRF for this example
+        http.csrf().disable().cors();
+
+        // Allow same origin for X-Frame-Options on the server
+        http.headers().frameOptions().sameOrigin();
+
         //Sessions are management by token
-        http = http
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and();
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
         //Public and private Paths
         http.authorizeRequests()
                 .antMatchers(HttpMethod.OPTIONS, "*").permitAll()
                 .antMatchers("/api/login").permitAll()
+                // Disallow everything else..
                 .anyRequest().authenticated();
-
+        //Apply JWT
+        http.addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
     @Bean
-    public PasswordEncoder encoder() {
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(12);
     }
 

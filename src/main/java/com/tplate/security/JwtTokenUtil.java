@@ -1,40 +1,31 @@
-package com.tplate.authentication;
+package com.tplate.security;
 
 import com.tplate.constans.Security;
-import com.tplate.permission.PermissionEntity;
 import com.tplate.user.UserEntity;
-import com.tplate.util.Hora;
+import com.tplate.util.Minutes;
 import com.tplate.util.TimeUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
+import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
-import java.io.Serializable;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@Service
-public class JwtTokenUtil implements Serializable {
-
-    private static final long serialVersionUID = -2550185165626007488L;
-
-    private String secretKey;
-
-    @PostConstruct
-    protected void init() {
-        secretKey = Base64.getEncoder().encodeToString(Security.JWT_SECRET_KEY.getBytes());
-    }
+@Component
+public class JwtTokenUtil {
 
     public String getUsernameFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
     }
 
+    public Date getIssuedAtDateFromToken(String token) {
+        return getClaimFromToken(token, Claims::getIssuedAt);
+    }
 
     public Date getExpirationDateFromToken(String token) {
         return getClaimFromToken(token, Claims::getExpiration);
@@ -46,7 +37,7 @@ public class JwtTokenUtil implements Serializable {
     }
 
     private Claims getAllClaimsFromToken(String token) {
-        return Jwts.parser().setSigningKey(this.secretKey).parseClaimsJws(token).getBody();
+        return Jwts.parser().setSigningKey(Security.JWT_SECRET_KEY).parseClaimsJws(token).getBody();
     }
 
     private Boolean isTokenExpired(String token) {
@@ -54,6 +45,10 @@ public class JwtTokenUtil implements Serializable {
         return expiration.before(new Date());
     }
 
+    private Boolean ignoreTokenExpiration(String token) {
+        // here you specify tokens, for that the expiration is ignored
+        return false;
+    }
 
     public String generateToken(UserEntity user) {
         Map<String, Object> claims = new HashMap<>();
@@ -63,7 +58,7 @@ public class JwtTokenUtil implements Serializable {
                         .stream()
                         .map(s -> new SimpleGrantedAuthority(s.getAuthority()))
                         .collect(Collectors.toList()));
-        claims.put(Security.JWT_USER_ID, user.getUsername());
+        claims.put(Security.JWT_USER_ID, user.getId());
         return doGenerateToken(claims, user.getUsername());
     }
 
@@ -71,11 +66,13 @@ public class JwtTokenUtil implements Serializable {
 
         return Jwts.builder().setClaims(claims).setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() +
-                        TimeUtil.toMilseconds(new Hora(Security.JWT_EXPIRATION_TIME_HH))))
+                .setExpiration(new Date(System.currentTimeMillis() + TimeUtil.toMiliseconds(new Minutes(Security.JWT_EXPIRATION_TIME_MINUTES))))
                 .signWith(SignatureAlgorithm.HS512, Security.JWT_SECRET_KEY).compact();
     }
 
+    public Boolean canTokenBeRefreshed(String token) {
+        return (!isTokenExpired(token) || ignoreTokenExpiration(token));
+    }
 
     public Boolean validateToken(String token, UserDetails userDetails) {
         Jwts.parser().setSigningKey(Security.JWT_SECRET_KEY).parseClaimsJws(token);
@@ -85,14 +82,14 @@ public class JwtTokenUtil implements Serializable {
     }
 
     public String resolveToken(HttpServletRequest req) {
-        String bearerToken = req.getHeader(Security.JWT_HEADER_STRING);
-        if (bearerToken != null && bearerToken.startsWith(Security.JWT_TOKEN_PREFIX)) {
+        String bearerToken = req.getHeader(Security.JWT_HEADER_AUTHORIZATION_KEY);
+        if (bearerToken != null && bearerToken.startsWith(Security.JWT_TOKEN_BEAR_PREFIX)) {
             return bearerToken.substring(7);
         }
         return null;
     }
 
-    private List<PermissionEntity> getAuthorities(UserEntity user) {
+    private Collection<? extends GrantedAuthority>  getAuthorities(UserEntity user) {
         return user.getRol().getPermissions();
 
     }

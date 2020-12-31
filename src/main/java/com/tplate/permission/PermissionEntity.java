@@ -13,7 +13,7 @@ public class PermissionEntity  implements GrantedAuthority {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "ID")
-    private Long ID;
+    private Long Id;
 
     @Column(name = "NAME")
     private String name;

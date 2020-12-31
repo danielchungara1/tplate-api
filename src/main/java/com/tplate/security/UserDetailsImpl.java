@@ -1,13 +1,11 @@
-package com.tplate.authorization;
+package com.tplate.security;
 
 import com.tplate.user.UserEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Getter

@@ -4,19 +4,17 @@ import com.tplate.permission.PermissionEntity;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 @Entity
-@Data
 @Table(name = "ROLES")
+@Data
 public class RolEntity {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "ID")
-    private Long ID;
+    private Long Id;
 
     @Column(name = "NAME")
     private String name;
@@ -24,7 +22,7 @@ public class RolEntity {
     @Column(name = "DESCRIPTION")
     private String description;
 
-    @ManyToMany(fetch= FetchType.LAZY)
+    @ManyToMany(fetch= FetchType.EAGER)
     @JoinTable(
             name = "ROL_PERMISSIONS",
             joinColumns = @JoinColumn(

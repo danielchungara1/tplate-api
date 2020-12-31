@@ -1,4 +1,4 @@
-package com.tplate.authentication;
+package com.tplate.security;
 
 import com.tplate.user.UserEntity;
 import com.tplate.user.UserRepository;
@@ -12,6 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
@@ -31,6 +32,7 @@ public class LoginService {
     @Autowired
     JwtTokenUtil jwtTokenUtil;
 
+    @Transactional
     public ResponseEntity loguear(CredentialDto credentialDto) {
 
         try {

@@ -1,4 +1,4 @@
-package com.tplate.security;
+package com.tplate.security.jwt;
 
 import com.tplate.user.UserEntity;
 import com.tplate.user.UserRepository;
@@ -23,7 +23,7 @@ public class JwtUserDetailsService implements UserDetailsService {
                 () -> new UsernameNotFoundException("User not found with username: " + username)
         );
 
-        return new UserDetailsImpl(user);
+        return new JwtUserDetailsImpl(user);
     }
 
 }

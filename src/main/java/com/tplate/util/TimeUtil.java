@@ -1,6 +1,6 @@
 package com.tplate.util;
 
-import com.tplate.constans.Time;
+import com.tplate.constants.Time;
 
 public class TimeUtil {
     public static Long toMiliseconds(Minutes minutes){

@@ -1,4 +1,4 @@
-package com.tplate.constans;
+package com.tplate.security.constants;
 
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,7 +25,6 @@ public class Security {
     public static final String JWT_HEADER_AUTHORIZATION_KEY = "Authorization";
     public static final String JWT_AUTHORITIES_KEY = "CLAIM_TOKEN";
     public static final String JWT_USER_ID = "CLAIM_ID";
-    public static final String JWT_ISSUER = "example.io";
 
 //  PARA TENER ACCESO A LAS CONSTANTES DE MANERA ESTATICA.
     @PostConstruct

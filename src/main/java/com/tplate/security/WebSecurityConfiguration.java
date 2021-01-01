@@ -1,5 +1,8 @@
 package com.tplate.security;
 
+import com.tplate.security.errors.ExceptionHandlerFilter;
+import com.tplate.security.jwt.JwtAuthorizationFilter;
+import com.tplate.security.jwt.JwtUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +25,10 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     JwtAuthorizationFilter jwtAuthorizationFilter;
 
     @Autowired
-    private JwtUserDetailsService jwtUserDetailsService;
+    JwtUserDetailsService jwtUserDetailsService;
+
+    @Autowired
+    ExceptionHandlerFilter exceptionHandlerFilter;
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
@@ -51,6 +57,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated();
         //Apply JWT
         http.addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(exceptionHandlerFilter, JwtAuthorizationFilter.class);
     }
 
     @Bean
@@ -63,6 +70,5 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
-
 
 }

@@ -1,5 +1,6 @@
 package com.tplate.security;
 
+import com.tplate.security.jwt.JwtTokenUtil;
 import com.tplate.user.UserEntity;
 import com.tplate.user.UserRepository;
 import com.google.common.base.Strings;
@@ -13,7 +14,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import com.tplate.security.exceptions.CredentialDtoException;
 import java.util.Objects;
 
 @Service

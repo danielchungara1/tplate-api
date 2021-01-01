@@ -1,4 +1,4 @@
-package com.tplate.security;
+package com.tplate.security.jwt;
 
 import com.tplate.user.UserEntity;
 import lombok.AllArgsConstructor;
@@ -9,7 +9,7 @@ import java.util.Collection;
 
 @AllArgsConstructor
 @Getter
-public class UserDetailsImpl implements UserDetails {
+public class JwtUserDetailsImpl implements UserDetails {
 
     private UserEntity userEntity;
 

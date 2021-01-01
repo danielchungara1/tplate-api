@@ -1,4 +1,4 @@
-package com.tplate.constans;
+package com.tplate.constants;
 
 public class Time {
     public static final Byte MINUTOS_EN_HORA = 60; //-128 to 127

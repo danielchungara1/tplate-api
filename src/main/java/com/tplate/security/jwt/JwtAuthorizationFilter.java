@@ -1,4 +1,4 @@
-package com.tplate.security;
+package com.tplate.security.jwt;
 
 import io.jsonwebtoken.*;
 import lombok.extern.log4j.Log4j2;
@@ -15,8 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 @Log4j2
@@ -44,6 +42,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 log.error("Unable to get JWT Token");
             } catch (ExpiredJwtException e) {
                 log.error("JWT Token has expired");
+                throw e;
             }
         } else {
             log.warn("JWT Token does not begin with Bearer String");

@@ -1,6 +1,6 @@
-package com.tplate.security;
+package com.tplate.security.jwt;
 
-import com.tplate.constans.Security;
+import com.tplate.security.constants.Security;
 import com.tplate.user.UserEntity;
 import com.tplate.util.Minutes;
 import com.tplate.util.TimeUtil;

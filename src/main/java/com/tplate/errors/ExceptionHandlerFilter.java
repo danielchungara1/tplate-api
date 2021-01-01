@@ -1,7 +1,6 @@
 package com.tplate.errors;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tplate.util.JsonUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -14,8 +13,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@Component
 @Log4j2
+@Component
 public class ExceptionHandlerFilter extends OncePerRequestFilter {
 
     private ErrorResponse errorResponse;
@@ -28,22 +27,14 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
             errorResponse = new ErrorResponse(e);
             log.error("Token expiro. {}", e.getClass().getCanonicalName());
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            response.getWriter().write(convertObjectToJson(errorResponse));
+            response.getWriter().write(JsonUtil.convertObjectToJson(errorResponse));
         }
         catch (Exception e) {
             // custom error response class used across my project
             errorResponse = new ErrorResponse(e);
             log.error("Error interno de servidor. {}", e.getClass().getCanonicalName());
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-            response.getWriter().write(convertObjectToJson(errorResponse));
+            response.getWriter().write(JsonUtil.convertObjectToJson(errorResponse));
         }
-    }
-
-    public String convertObjectToJson(Object object) throws JsonProcessingException {
-        if (object == null) {
-            return null;
-        }
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.writeValueAsString(object);
     }
 }

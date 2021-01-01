@@ -24,4 +24,17 @@ public class UserEntity {
     @ManyToOne(fetch=FetchType.EAGER)
     @JoinColumn(name="ROL_ID")
     private RolEntity rol;
+
+    @Column(name = "NAME")
+    private String name;
+
+    @Column(name = "LASTNAME")
+    private String lastname;
+
+    @Column(name = "EMAIL")
+    private String email;
+
+    @Column(name = "TELEFONO")
+    private String telefono;
+
 }

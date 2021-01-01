@@ -76,20 +76,4 @@ public class LoginService {
         }
 
     }
-
-    @Deprecated
-    private void validateCredentials(CredentialDto credentialDto) throws CredentialDtoException {
-        if (Objects.isNull(credentialDto) || Strings.isNullOrEmpty(credentialDto.getUsername()) || Strings.isNullOrEmpty(credentialDto.getPassword())) {
-            throw new CredentialDtoException("El username y password son requeridos.");
-        }
-
-        if (!userRepository.existsByUsername(credentialDto.getUsername())) {
-            throw new CredentialDtoException();
-        } else {
-            UserEntity userEntity = userRepository.getOne(credentialDto.getUsername());
-            if (!passwordEncoder.matches(credentialDto.getPassword(), userEntity.getPassword())) {
-                throw new CredentialDtoException();
-            }
-        }
-    }
 }

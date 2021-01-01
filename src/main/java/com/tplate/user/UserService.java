@@ -27,9 +27,15 @@ public class UserService {
             //Validar existencia de usuario
             this.validateExistenceById(idUser);
 
-            //Generar token
+            //Guardar Perfil
+            UserEntity userEntity = this.userRepository.getOne(idUser);
+            userEntity.setName(userProfileDto.getName());
+            userEntity.setLastname(userProfileDto.getLastname());
+            userEntity.setEmail(userProfileDto.getEmail());
+            userEntity.setTelefono(userProfileDto.getTelefono());
+            this.userRepository.save(userEntity);
 
-            return new ResponseEntity("", HttpStatus.OK);
+            return new ResponseEntity("Perfil editado.", HttpStatus.OK);
 
         } catch (UserProfileDtoException e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.CONFLICT);

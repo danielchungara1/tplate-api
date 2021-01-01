@@ -1,4 +1,4 @@
-package com.tplate.security.errors;
+package com.tplate.errors;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.Data;

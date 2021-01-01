@@ -1,6 +1,6 @@
 package com.tplate.security;
 
-import com.tplate.security.errors.ExceptionHandlerFilter;
+import com.tplate.errors.ExceptionHandlerFilter;
 import com.tplate.security.jwt.JwtAuthorizationFilter;
 import com.tplate.security.jwt.JwtUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;

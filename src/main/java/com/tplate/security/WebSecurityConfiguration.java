@@ -16,6 +16,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -45,6 +46,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         // Allow same origin for X-Frame-Options on the server
         http.headers().frameOptions().sameOrigin();
+
+        //Permit request from diferent origins, equivalent to: @CrossOrigin
+        http.cors().configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues());
 
         //Sessions are management by token
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);

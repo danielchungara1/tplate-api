@@ -51,8 +51,13 @@ public class LoginService {
             //Generar token
             String username = credentialDto.getUsername();
             String token = this.jwtTokenUtil.generateToken(this.userRepository.findByUsername(credentialDto.getUsername()).get());
+            UserEntity userEntity = this.userRepository.findByUsername(credentialDto.getUsername()).get();
+            String name = userEntity.getName();
+            String lastname = userEntity.getLastname();
+            String email = userEntity.getEmail();
+            String telefono = userEntity.getTelefono();
             log.info("Usuario logueado OK. {}", credentialDto.getUsername());
-            return new ResponseEntity(new LoginUserDto(username, token), HttpStatus.OK);
+            return new ResponseEntity(new LoginUserDto(username, token, name, lastname, email, telefono), HttpStatus.OK);
 
         } catch (CredentialDtoException e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.CONFLICT);

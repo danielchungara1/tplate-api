@@ -37,6 +37,7 @@ public class LoginService {
     public ResponseEntity loguear(CredentialDto credentialDto) {
 
         try {
+
             //Validacion campos no nulos
             this.validateDto(credentialDto);
 
@@ -48,10 +49,10 @@ public class LoginService {
             );
 
             //Generar token
-            final String token = this.jwtTokenUtil.generateToken(this.userRepository.findByUsername(credentialDto.getUsername()).get());
+            String username = credentialDto.getUsername();
+            String token = this.jwtTokenUtil.generateToken(this.userRepository.findByUsername(credentialDto.getUsername()).get());
             log.info("Usuario logueado OK. {}", credentialDto.getUsername());
-
-            return new ResponseEntity(token, HttpStatus.OK);
+            return new ResponseEntity(new LoginUserDto(username, token), HttpStatus.OK);
 
         } catch (CredentialDtoException e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.CONFLICT);

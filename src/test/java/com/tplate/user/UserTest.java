@@ -9,7 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @Log4j2
-class UserEntityTest {
+class UserTest {
 
     @Autowired
     PasswordEncoder passwordEncoder;

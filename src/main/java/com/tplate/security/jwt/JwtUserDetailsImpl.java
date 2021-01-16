@@ -1,6 +1,6 @@
 package com.tplate.security.jwt;
 
-import com.tplate.user.UserEntity;
+import com.tplate.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
@@ -11,21 +11,21 @@ import java.util.Collection;
 @Getter
 public class JwtUserDetailsImpl implements UserDetails {
 
-    private UserEntity userEntity;
+    private User user;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return userEntity.getRol().getPermissions();
+        return user.getRol().getPermissions();
     }
 
     @Override
     public String getPassword() {
-        return userEntity.getPassword();
+        return user.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return userEntity.getUsername();
+        return user.getUsername();
     }
 
     @Override

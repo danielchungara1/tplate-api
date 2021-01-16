@@ -1,6 +1,7 @@
 package com.tplate.user;
 
-import com.tplate.rol.RolEntity;
+import com.tplate.rol.Rol;
+import javafx.scene.canvas.GraphicsContext;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -8,7 +9,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "USERS")
 @Data
-public class UserEntity {
+public class User {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -23,7 +24,7 @@ public class UserEntity {
 
     @ManyToOne(fetch=FetchType.EAGER)
     @JoinColumn(name="ROL_ID")
-    private RolEntity rol;
+    private Rol rol;
 
     @Column(name = "NAME")
     private String name;
@@ -36,5 +37,8 @@ public class UserEntity {
 
     @Column(name = "TELEFONO")
     private String telefono;
+
+    @Column(name = "RESET_PASSWORD_TOKEN")
+    private String resetPassToken ;
 
 }

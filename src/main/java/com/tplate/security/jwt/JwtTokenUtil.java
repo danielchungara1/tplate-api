@@ -1,7 +1,7 @@
 package com.tplate.security.jwt;
 
 import com.tplate.security.constants.Security;
-import com.tplate.user.UserEntity;
+import com.tplate.user.User;
 import com.tplate.util.Minutes;
 import com.tplate.util.TimeUtil;
 import io.jsonwebtoken.Claims;
@@ -50,7 +50,7 @@ public class JwtTokenUtil {
         return false;
     }
 
-    public String generateToken(UserEntity user) {
+    public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
 
         claims.put(Security.JWT_AUTHORITIES_KEY,
@@ -89,7 +89,7 @@ public class JwtTokenUtil {
         return null;
     }
 
-    private Collection<? extends GrantedAuthority>  getAuthorities(UserEntity user) {
+    private Collection<? extends GrantedAuthority>  getAuthorities(User user) {
         return user.getRol().getPermissions();
 
     }

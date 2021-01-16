@@ -28,12 +28,12 @@ public class UserService {
             this.validateExistenceById(idUser);
 
             //Guardar Perfil
-            UserEntity userEntity = this.userRepository.getOne(idUser);
-            userEntity.setName(userProfileDto.getName());
-            userEntity.setLastname(userProfileDto.getLastname());
-            userEntity.setEmail(userProfileDto.getEmail());
-            userEntity.setTelefono(userProfileDto.getTelefono());
-            this.userRepository.save(userEntity);
+            User user = this.userRepository.getOne(idUser);
+            user.setName(userProfileDto.getName());
+            user.setLastname(userProfileDto.getLastname());
+            user.setEmail(userProfileDto.getEmail());
+            user.setTelefono(userProfileDto.getTelefono());
+            this.userRepository.save(user);
 
             return new ResponseEntity("Perfil editado.", HttpStatus.OK);
 

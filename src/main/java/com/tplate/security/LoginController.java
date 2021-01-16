@@ -11,9 +11,15 @@ public class LoginController {
     @Autowired
     LoginService loginService;
 
-    @PostMapping
+    @PostMapping("")
     public ResponseEntity login(@RequestBody(required=false) CredentialDto credentialDto){
         return this.loginService.loguear(credentialDto);
+    }
+
+    //Recupero de password
+    @PostMapping("/reset-password")
+    public ResponseEntity resetPassword(@RequestBody(required=true) ResetPasswordDto resetPasswordDto){
+        return this.loginService.resetPassword(resetPasswordDto);
     }
 
 }

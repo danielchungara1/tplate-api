@@ -1,4 +1,4 @@
-package com.tplate.security;
+package com.tplate.security.config;
 
 import com.tplate.errors.ExceptionHandlerFilter;
 import com.tplate.security.jwt.JwtAuthorizationFilter;
@@ -56,7 +56,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         //Public and private Paths
         http.authorizeRequests()
                 .antMatchers(HttpMethod.OPTIONS, "*").permitAll()
-                .antMatchers("/api/login").permitAll()
+                .antMatchers("/api/security/login").permitAll()
+                .antMatchers("/api/security/sign-up").permitAll()
                 // Disallow everything else..
                 .anyRequest().authenticated();
         //Apply JWT

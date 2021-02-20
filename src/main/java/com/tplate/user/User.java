@@ -2,13 +2,19 @@ package com.tplate.user;
 
 import com.tplate.rol.Rol;
 import javafx.scene.canvas.GraphicsContext;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "USERS")
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
 
     @Id
@@ -40,5 +46,8 @@ public class User {
 
     @Column(name = "RESET_PASSWORD_TOKEN")
     private String resetPassToken ;
+
+    @Transient
+    private String token;
 
 }

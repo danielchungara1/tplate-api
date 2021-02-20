@@ -1,4 +1,4 @@
-package com.tplate.security;
+package com.tplate.security.email;
 
 import lombok.Builder;
 import lombok.Data;

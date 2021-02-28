@@ -163,9 +163,8 @@ public class SecurityService {
                     .message("Usuario registrado correctamente. " + newUser.getUsername())
                     .build();
 
-        } catch (SignInException e) {
+        } catch (SignInException | ValidatorException e) {
             return ResponseBuilder.buildConflict(e.getMessage());
-
         } catch (Exception e) {
             log.error("Error inesperado. {}, {}", e.getMessage(), e.getClass().getCanonicalName());
             return ResponseBuilder.buildConflict("Error al registrar el usuario.");

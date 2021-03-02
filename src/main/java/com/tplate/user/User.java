@@ -1,7 +1,7 @@
 package com.tplate.user;
 
 import com.tplate.rol.Rol;
-import javafx.scene.canvas.GraphicsContext;
+import com.tplate.security.models.ResetPassword;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -43,9 +43,6 @@ public class User {
 
     @Column(name = "TELEFONO")
     private String telefono;
-
-    @Column(name = "RESET_PASSWORD_TOKEN")
-    private String resetPassToken ;
 
     @Transient
     private String token;

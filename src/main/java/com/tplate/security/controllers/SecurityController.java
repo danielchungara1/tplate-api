@@ -22,9 +22,9 @@ public class SecurityController {
     }
 
     //Recupero de password
-    @PostMapping("/reset-password")
+    @PostMapping("/reset-password/step1")
     public ResponseEntity resetPassword(@RequestBody(required=true) ResetPasswordDto resetPasswordDto){
-        return this.securityService.resetPassword(resetPasswordDto);
+        return this.securityService.resetPasswordStep1(resetPasswordDto);
     }
 
     @PostMapping("/sign-up")

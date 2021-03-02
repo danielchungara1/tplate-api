@@ -12,6 +12,8 @@ import com.tplate.security.email.EmailSenderService;
 import com.tplate.security.exceptions.BaseDtoException;
 import com.tplate.security.exceptions.SignInException;
 import com.tplate.security.jwt.JwtTokenUtil;
+import com.tplate.security.models.ResetPassword;
+import com.tplate.security.repositories.ResetCodeRepository;
 import com.tplate.user.User;
 import com.tplate.user.UserRepository;
 import lombok.extern.log4j.Log4j2;
@@ -23,6 +25,10 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
+import java.util.Optional;
+import java.util.Random;
 
 @Service
 @Log4j2
@@ -46,6 +52,11 @@ public class SecurityService {
     @Autowired
     RolRepository rolRepository;
 
+    @Autowired
+    ResetCodeRepository resetCodeRepository;
+
+    //Miscelaneos
+    private Random rand = new Random();
 
     @Transactional
     public ResponseEntity loguear(CredentialDto credentialDto) {
@@ -87,30 +98,43 @@ public class SecurityService {
     }
 
     @Transactional
-    public ResponseEntity resetPassword(ResetPasswordDto resetPasswordDto) {
-
+    public ResponseEntity resetPasswordStep1(ResetPasswordDto resetPasswordDto) {
         try {
-
-            //Validacion
+            // Validacion Dto
             resetPasswordDto.validate();
-            this.validateEmailDB(resetPasswordDto.getEmail());
-
             String email = resetPasswordDto.getEmail();
 
-            //Generar token
-            String resetToken = this.tokenFrom(email);
-            User user = this.userRepository.findByEmail(email).get();
-            user.setResetPassToken(resetToken);
-            this.userRepository.save(user);
+            // Validacion acoplada a la DB
+            if (!this.userRepository.existsByUsername(email)) {
+                log.error("Email inexistente, Se esta intentado resetear un password con un mail invalido. {}", email);
+                throw new BaseDtoException("Email inexistente.");
+            }
+
+            // Generar y guardar el reset code
+            ResetPassword resetPassword = this.resetCodeRepository
+                    .findByUser(this.userRepository.findByUsername(email).get())
+                    .orElse(null);
+            if (resetPassword == null) {
+                resetPassword = ResetPassword.builder()
+                        .code(String.format("%04d", this.rand.nextInt(10000)))
+                        .expiration(new Date(System.currentTimeMillis() + (5 * 60 * 1000)))
+                        .user(this.userRepository.findByUsername(email).get())
+                        .build();
+            } else {
+                resetPassword.setCode(String.format("%04d", this.rand.nextInt(10000)));
+                resetPassword.setExpiration(new Date(System.currentTimeMillis() + (5 * 60 * 1000)));
+            }
+
+            this.resetCodeRepository.save(resetPassword);
 
             //Envio del mail
             this.emailSenderService.send(Email.builder()
                     .to(email)
-                    .token(resetToken)
+                    .resetCode(resetPassword.getCode())
+                    .subject("Reset Password Code")
                     .build());
 
             log.info("Envio de email para resetear el password OK. {}", email);
-
 
             return ResponseBuilder.builder()
                     .ok()
@@ -124,11 +148,11 @@ public class SecurityService {
         }
     }
 
-    private String tokenFrom(String email) {
+    private String resetCode(String email) {
         throw new UnsupportedOperationException();
     }
 
-    private void validateEmailDB(String email) throws BaseDtoException {
+    private void validateExistence(String email) throws BaseDtoException {
         if (!this.userRepository.existsByEmail(email)) {
             log.error("Email inexistente, Se esta intentado resetear un password con un mail invalido. {}", email);
             throw new BaseDtoException("Email inexistente.");

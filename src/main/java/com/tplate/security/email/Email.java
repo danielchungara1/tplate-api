@@ -7,5 +7,6 @@ import lombok.Data;
 @Data
 public class Email {
     private String to;
-    private String token;
+    private String resetCode;
+    private String subject;
 }

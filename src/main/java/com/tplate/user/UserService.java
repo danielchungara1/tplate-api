@@ -31,7 +31,6 @@ public class UserService {
             User user = this.userRepository.getOne(idUser);
             user.setName(userProfileDto.getName());
             user.setLastname(userProfileDto.getLastname());
-            user.setEmail(userProfileDto.getEmail());
             user.setTelefono(userProfileDto.getTelefono());
             this.userRepository.save(user);
 

@@ -3,10 +3,7 @@ package com.tplate.security.services;
 import com.tplate.exceptions.ValidatorException;
 import com.tplate.responses.builders.ResponseBuilder;
 import com.tplate.rol.RolRepository;
-import com.tplate.security.dtos.CredentialDto;
-import com.tplate.security.dtos.NewUserDto;
-import com.tplate.security.dtos.ResetPasswordDto;
-import com.tplate.security.dtos.UserDto;
+import com.tplate.security.dtos.*;
 import com.tplate.security.email.Email;
 import com.tplate.security.email.EmailSenderService;
 import com.tplate.security.exceptions.BaseDtoException;
@@ -27,7 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
-import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -98,7 +94,7 @@ public class SecurityService {
     }
 
     @Transactional
-    public ResponseEntity resetPasswordStep1(ResetPasswordDto resetPasswordDto) {
+    public ResponseEntity resetPasswordStep1(ResetPasswordStep1Dto resetPasswordDto) {
         try {
             // Validacion Dto
             resetPasswordDto.validate();
@@ -117,12 +113,12 @@ public class SecurityService {
             if (resetPassword == null) {
                 resetPassword = ResetPassword.builder()
                         .code(String.format("%04d", this.rand.nextInt(10000)))
-                        .expiration(new Date(System.currentTimeMillis() + (5 * 60 * 1000)))
+                        .expiration(new Date(System.currentTimeMillis() + (2 * 60 * 1000)))
                         .user(this.userRepository.findByUsername(email).get())
                         .build();
             } else {
                 resetPassword.setCode(String.format("%04d", this.rand.nextInt(10000)));
-                resetPassword.setExpiration(new Date(System.currentTimeMillis() + (5 * 60 * 1000)));
+                resetPassword.setExpiration(new Date(System.currentTimeMillis() + (2 * 60 * 1000)));
             }
 
             this.resetCodeRepository.save(resetPassword);
@@ -148,14 +144,57 @@ public class SecurityService {
         }
     }
 
-    private String resetCode(String email) {
-        throw new UnsupportedOperationException();
-    }
+    @Transactional
+    public ResponseEntity resetPasswordStep2(ResetPasswordStep2Dto resetPasswordDto) {
+        try {
+            // Validacion Dto
+            resetPasswordDto.validate();
+            String email = resetPasswordDto.getEmail();
 
-    private void validateExistence(String email) throws BaseDtoException {
-        if (!this.userRepository.existsByEmail(email)) {
-            log.error("Email inexistente, Se esta intentado resetear un password con un mail invalido. {}", email);
-            throw new BaseDtoException("Email inexistente.");
+            // Validacion acoplada a la DB
+            if (!this.userRepository.existsByUsername(email)) {
+                log.error("Email inexistente, Se esta intentado resetear un password con un mail invalido. {}", email);
+                throw new BaseDtoException("Email inexistente.");
+            }
+
+            // Validacion del codigo de reseto
+            ResetPassword resetPassword = this.resetCodeRepository
+                    .findByUser(this.userRepository.findByUsername(email).get())
+                    .orElse(null);
+            if (resetPassword == null) {
+                log.error("El email {}, no tiene asociado ningun codigo de reseto de password.", email);
+                throw new BaseDtoException("Codigo de reseteo inexistente.");
+            }
+
+            // Validacion de coincidencia del codigo
+            if (!resetPassword.getCode().equals(resetPasswordDto.getCode())) {
+                log.error("El codigo de reseteo en la base {}, no coincide con el suministrado {}."
+                        , resetPassword.getCode(), resetPasswordDto.getCode());
+                throw new BaseDtoException("Codigo de reseto no coincide con el enviado. " + resetPasswordDto.getCode());
+            }
+
+            // Validacion de expiracion del codigo
+            if (! (new Date(System.currentTimeMillis()).before(resetPassword.getExpiration()))) {
+                log.error("El codigo de reseteo expiro {}.",resetPassword.getCode());
+                throw new BaseDtoException("Codigo de reseto expiro.");
+            }
+
+            // Persistencia del nuevo password
+            User user = this.userRepository.findByUsername(resetPasswordDto.getEmail()).get();
+            user.setPassword(passwordEncoder.encode(resetPasswordDto.getPassword()));
+            userRepository.save(user);
+            log.info("Reseto de password exitoso. Usuario {}", user.getUsername());
+
+            return ResponseBuilder.builder()
+                    .ok()
+                    .message("Se modifico el password correctamente.")
+                    .build();
+        } catch (ValidatorException | BaseDtoException e) {
+            return ResponseBuilder.buildConflict(e.getMessage());
+
+        } catch (Exception e) {
+            log.error("Error inesperado. {}, {}", e.getMessage(), e.getClass().getCanonicalName());
+            return ResponseBuilder.buildConflict("Error inesperado. Consulte a Sistemas.");
         }
     }
 

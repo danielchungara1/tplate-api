@@ -7,7 +7,7 @@ import lombok.ToString;
 
 @Data
 @ToString
-public class ResetPasswordDto {
+public class ResetPasswordStep1Dto {
     private String email;
 
     public void validate() throws ValidatorException {

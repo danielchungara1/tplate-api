@@ -55,25 +55,25 @@ public class SecurityService {
     private Random rand = new Random();
 
     @Transactional
-    public ResponseEntity loguear(CredentialDto credentialDto) {
+    public ResponseEntity loguear(LoginDto loginDto) {
 
         try {
 
             //Validate Dto
-            credentialDto.validate();
+            loginDto.validate();
 
             //Verificar que el usuario exista en la BD y coincida el password
             this.authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            credentialDto.getUsername(), credentialDto.getPassword()
+                            loginDto.getUsername(), loginDto.getPassword()
                     )
             );
 
             //Generar token
-            String token = this.jwtTokenUtil.generateToken(this.userRepository.findByUsername(credentialDto.getUsername()).get());
-            User user = this.userRepository.findByUsername(credentialDto.getUsername()).get();
+            String token = this.jwtTokenUtil.generateToken(this.userRepository.findByUsername(loginDto.getUsername()).get());
+            User user = this.userRepository.findByUsername(loginDto.getUsername()).get();
             user.setToken(token);
-            log.info("Usuario logueado OK. {}", credentialDto.getUsername());
+            log.info("Usuario logueado OK. {}", loginDto.getUsername());
 
             //Response
             return ResponseBuilder
@@ -199,28 +199,28 @@ public class SecurityService {
     }
 
     @Transactional
-    public ResponseEntity signUp(NewUserDto newUserDto) {
+    public ResponseEntity signUp(SingUpDto singUpDto) {
 
         try {
 
             //Validacion campos no nulos
-            newUserDto.validate();
+            singUpDto.validate();
 
             //Verificar que el username no exista
-            if (this.userRepository.existsByUsername(newUserDto.getUsername())) {
-                log.error("Username existente. {}", newUserDto.getUsername());
+            if (this.userRepository.existsByUsername(singUpDto.getUsername())) {
+                log.error("Username existente. {}", singUpDto.getUsername());
                 throw new SignInException("Username existente.");
             }
             //Crear nuevo usuario
             User newUser = User.builder()
-                    .username(newUserDto.getUsername())
-                    .password(this.passwordEncoder.encode(newUserDto.getPassword()))
+                    .username(singUpDto.getUsername())
+                    .password(this.passwordEncoder.encode(singUpDto.getPassword()))
                     .rol(this.rolRepository.findByName("ADMINISTRADOR").get())
                     .build();
             this.userRepository.save(newUser);
 
             //Response
-            log.info("Usuario registrado OK. {}", newUserDto.getUsername());
+            log.info("Usuario registrado OK. {}", singUpDto.getUsername());
             return ResponseBuilder.builder()
                     .ok()
                     .message("Usuario registrado correctamente. " + newUser.getUsername())

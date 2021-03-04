@@ -3,8 +3,8 @@ package com.tplate.security.controllers;
 import com.tplate.security.dtos.ResetPasswordStep1Dto;
 import com.tplate.security.dtos.ResetPasswordStep2Dto;
 import com.tplate.security.services.SecurityService;
-import com.tplate.security.dtos.CredentialDto;
-import com.tplate.security.dtos.NewUserDto;
+import com.tplate.security.dtos.LoginDto;
+import com.tplate.security.dtos.SingUpDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,8 +18,8 @@ public class SecurityController {
     SecurityService securityService;
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody CredentialDto credentialDto){
-        return this.securityService.loguear(credentialDto);
+    public ResponseEntity login(@RequestBody LoginDto loginDto){
+        return this.securityService.loguear(loginDto);
     }
 
     //Recupero de password
@@ -34,8 +34,8 @@ public class SecurityController {
     }
 
     @PostMapping("/sign-up")
-    public ResponseEntity signUp(@RequestBody(required=true) NewUserDto newUserDto){
-        return this.securityService.signUp(newUserDto);
+    public ResponseEntity signUp(@RequestBody(required=true) SingUpDto singUpDto){
+        return this.securityService.signUp(singUpDto);
     }
 
 }

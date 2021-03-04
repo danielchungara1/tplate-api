@@ -16,6 +16,7 @@ public class ResetPasswordStep2Dto {
         Validator.evaluate()
                 .isRequired(this.email, "Email")
                 .isRequired(this.code, "Codigo de Recuperacion")
-                .isRequired(this.password, "Password");
+                .isRequired(this.password, "Password")
+                .isEmail(this.email, "Email");
     }
 }

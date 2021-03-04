@@ -9,7 +9,7 @@ import java.util.Base64;
 
 @Component
 @Log4j2
-public class Security {
+public class SecurityConstants {
 
 //  CONSTANTES POR ARCHIVO DE CONFIGURACION
     @Value("${jwt2.secret}")

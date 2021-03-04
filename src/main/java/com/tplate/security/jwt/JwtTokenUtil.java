@@ -1,6 +1,6 @@
 package com.tplate.security.jwt;
 
-import com.tplate.security.constants.Security;
+import com.tplate.security.constants.SecurityConstants;
 import com.tplate.user.User;
 import com.tplate.util.Minutes;
 import com.tplate.util.TimeUtil;
@@ -37,7 +37,7 @@ public class JwtTokenUtil {
     }
 
     private Claims getAllClaimsFromToken(String token) {
-        return Jwts.parser().setSigningKey(Security.JWT_SECRET_KEY).parseClaimsJws(token).getBody();
+        return Jwts.parser().setSigningKey(SecurityConstants.JWT_SECRET_KEY).parseClaimsJws(token).getBody();
     }
 
     private Boolean isTokenExpired(String token) {
@@ -53,12 +53,12 @@ public class JwtTokenUtil {
     public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
 
-        claims.put(Security.JWT_AUTHORITIES_KEY,
+        claims.put(SecurityConstants.JWT_AUTHORITIES_KEY,
                 getAuthorities(user)
                         .stream()
                         .map(s -> new SimpleGrantedAuthority(s.getAuthority()))
                         .collect(Collectors.toList()));
-        claims.put(Security.JWT_USER_ID, user.getId());
+        claims.put(SecurityConstants.JWT_USER_ID, user.getId());
         return doGenerateToken(claims, user.getUsername());
     }
 
@@ -66,8 +66,8 @@ public class JwtTokenUtil {
 
         return Jwts.builder().setClaims(claims).setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + TimeUtil.toMiliseconds(new Minutes(Security.JWT_EXPIRATION_TIME_MINUTES))))
-                .signWith(SignatureAlgorithm.HS512, Security.JWT_SECRET_KEY).compact();
+                .setExpiration(new Date(System.currentTimeMillis() + TimeUtil.toMiliseconds(new Minutes(SecurityConstants.JWT_EXPIRATION_TIME_MINUTES))))
+                .signWith(SignatureAlgorithm.HS512, SecurityConstants.JWT_SECRET_KEY).compact();
     }
 
     public Boolean canTokenBeRefreshed(String token) {
@@ -75,15 +75,15 @@ public class JwtTokenUtil {
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {
-        Jwts.parser().setSigningKey(Security.JWT_SECRET_KEY).parseClaimsJws(token);
+        Jwts.parser().setSigningKey(SecurityConstants.JWT_SECRET_KEY).parseClaimsJws(token);
 
         final String username = getUsernameFromToken(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
     public String resolveToken(HttpServletRequest req) {
-        String bearerToken = req.getHeader(Security.JWT_HEADER_AUTHORIZATION_KEY);
-        if (bearerToken != null && bearerToken.startsWith(Security.JWT_TOKEN_BEAR_PREFIX)) {
+        String bearerToken = req.getHeader(SecurityConstants.JWT_HEADER_AUTHORIZATION_KEY);
+        if (bearerToken != null && bearerToken.startsWith(SecurityConstants.JWT_TOKEN_BEAR_PREFIX)) {
             return bearerToken.substring(7);
         }
         return null;

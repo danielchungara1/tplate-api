@@ -18,8 +18,8 @@ public class Validator {
     }
 
     public Validator isEmail(String value, String name) throws ValidatorException {
-        if (value == null) {
-            throw new ValidatorException(name + " no tiene formato de email.");
+        if (value == null || !value.contains("@") || !value.contains(".")) {
+            throw new ValidatorException(name + " ingresado no tiene formato de email.");
         } else {
             return this;
         }

@@ -58,7 +58,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.OPTIONS, "*").permitAll()
                 .antMatchers("/api/security/login").permitAll()
                 .antMatchers("/api/security/sign-up").permitAll()
-                .antMatchers("/api/security/reset-password").permitAll()
+                .antMatchers("/api/security/reset-password/**").permitAll()
                 // Disallow everything else..
                 .anyRequest().authenticated();
         //Apply JWT

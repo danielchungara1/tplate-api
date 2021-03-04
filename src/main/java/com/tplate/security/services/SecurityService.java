@@ -51,6 +51,9 @@ public class SecurityService {
     @Autowired
     ResetCodeRepository resetCodeRepository;
 
+    @Autowired
+    ResetPasswordService resetPasswordService;
+
     //Miscelaneos
     private Random rand = new Random();
 
@@ -112,13 +115,13 @@ public class SecurityService {
                     .orElse(null);
             if (resetPassword == null) {
                 resetPassword = ResetPassword.builder()
-                        .code(String.format("%04d", this.rand.nextInt(10000)))
-                        .expiration(new Date(System.currentTimeMillis() + (2 * 60 * 1000)))
+                        .code(this.resetPasswordService.code())
+                        .expiration(this.resetPasswordService.expiration())
                         .user(this.userRepository.findByUsername(email).get())
                         .build();
             } else {
-                resetPassword.setCode(String.format("%04d", this.rand.nextInt(10000)));
-                resetPassword.setExpiration(new Date(System.currentTimeMillis() + (2 * 60 * 1000)));
+                resetPassword.setCode(this.resetPasswordService.code());
+                resetPassword.setExpiration(this.resetPasswordService.expiration());
             }
 
             this.resetCodeRepository.save(resetPassword);
@@ -134,7 +137,7 @@ public class SecurityService {
 
             return ResponseBuilder.builder()
                     .ok()
-                    .message("Se envio correctamente el mail para resetear el password.")
+                    .message("Se envio el codigo correctamente.")
                     .build();
         } catch (ValidatorException | BaseDtoException e) {
             return ResponseBuilder.buildConflict(e.getMessage());

@@ -1,6 +1,5 @@
 package com.tplate.security.services;
 
-import com.sun.mail.util.MailConnectException;
 import com.tplate.exceptions.ValidatorException;
 import com.tplate.responses.builders.ResponseBuilder;
 import com.tplate.security.rol.RolRepository;
@@ -109,7 +108,7 @@ public class SecurityService {
             // Validacion acoplada a la DB
             if (!this.userRepository.existsByUsername(email)) {
                 log.error("Email inexistente, Se esta intentado resetear un password con un mail invalido. {}", email);
-                throw new BaseDtoException("Email inexistente.");
+                throw new BaseDtoException("Email no existe.");
             }
 
             // Generar y guardar el reset code
@@ -172,20 +171,20 @@ public class SecurityService {
                     .orElse(null);
             if (resetPassword == null) {
                 log.error("El email {}, no tiene asociado ningun codigo de reseto de password.", email);
-                throw new BaseDtoException("Codigo de reseteo inexistente.");
+                throw new BaseDtoException("Codigo de recuperacion no existe.");
             }
 
             // Validacion de coincidencia del codigo
             if (!resetPassword.getCode().equals(resetPasswordDto.getCode())) {
                 log.error("El codigo de reseteo en la base {}, no coincide con el suministrado {}."
                         , resetPassword.getCode(), resetPasswordDto.getCode());
-                throw new BaseDtoException("Codigo de reseto no coincide con el enviado. " + resetPasswordDto.getCode());
+                throw new BaseDtoException("Codigo de recuperacion incorrecto. ");
             }
 
             // Validacion de expiracion del codigo
             if (! (new Date(System.currentTimeMillis()).before(resetPassword.getExpiration()))) {
                 log.error("El codigo de reseteo expiro {}.",resetPassword.getCode());
-                throw new BaseDtoException("Codigo de reseto expiro.");
+                throw new BaseDtoException("Codigo de recuperacion ha expirado.");
             }
 
             // Persistencia del nuevo password

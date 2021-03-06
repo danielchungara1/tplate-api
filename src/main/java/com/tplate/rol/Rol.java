@@ -1,6 +1,6 @@
 package com.tplate.rol;
 
-import com.tplate.permission.PermissionEntity;
+import com.tplate.permission.Permission;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -29,6 +29,6 @@ public class Rol {
                     name = "ID_ROL", referencedColumnName = "ID"),
             inverseJoinColumns = @JoinColumn(
                     name = "ID_PERMISSION", referencedColumnName = "ID"))
-    private List<PermissionEntity> permissions;
+    private List<Permission> permissions;
 
 }

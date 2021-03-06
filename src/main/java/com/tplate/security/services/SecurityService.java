@@ -1,5 +1,6 @@
 package com.tplate.security.services;
 
+import com.sun.mail.util.MailConnectException;
 import com.tplate.exceptions.ValidatorException;
 import com.tplate.responses.builders.ResponseBuilder;
 import com.tplate.security.rol.RolRepository;
@@ -16,6 +17,7 @@ import com.tplate.user.UserRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.MailSendException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -23,6 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.Random;
 
@@ -141,7 +144,10 @@ public class SecurityService {
                     .build();
         } catch (ValidatorException | BaseDtoException e) {
             return ResponseBuilder.buildConflict(e.getMessage());
-        } catch (Exception e) {
+        }catch ( MailSendException e){
+            log.error("Error envio de email. {}, {}", e.getMessage(), e.getClass().getCanonicalName());
+            return ResponseBuilder.buildConflict("No se puede enviar el email en estos momentos.");
+        }catch (Exception e) {
             log.error("Error inesperado. {}, {}", e.getMessage(), e.getClass().getCanonicalName());
             return ResponseBuilder.buildConflict("Error inesperado. Consulte a Sistemas.");
         }

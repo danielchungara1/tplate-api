@@ -1,4 +1,4 @@
-package com.tplate.permission;
+package com.tplate.security.permission;
 
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;

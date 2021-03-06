@@ -1,6 +1,6 @@
-package com.tplate.rol;
+package com.tplate.security.rol;
 
-import com.tplate.permission.Permission;
+import com.tplate.security.permission.Permission;
 import lombok.Data;
 
 import javax.persistence.*;

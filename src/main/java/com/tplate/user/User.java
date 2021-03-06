@@ -1,7 +1,6 @@
 package com.tplate.user;
 
-import com.tplate.rol.Rol;
-import com.tplate.security.models.ResetPassword;
+import com.tplate.security.rol.Rol;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

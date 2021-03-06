@@ -1,4 +1,4 @@
-package com.tplate.rol;
+package com.tplate.security.rol;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

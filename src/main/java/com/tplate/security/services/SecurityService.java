@@ -2,7 +2,7 @@ package com.tplate.security.services;
 
 import com.tplate.exceptions.ValidatorException;
 import com.tplate.responses.builders.ResponseBuilder;
-import com.tplate.rol.RolRepository;
+import com.tplate.security.rol.RolRepository;
 import com.tplate.security.dtos.*;
 import com.tplate.security.email.Email;
 import com.tplate.security.email.EmailSenderService;

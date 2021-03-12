@@ -12,7 +12,7 @@ public class ResetPasswordStep1Dto {
 
     public void validate() throws ValidatorException {
         Validator.evaluate()
-                .isRequired(this.email, "Email")
-                .isEmail(this.email, "Email");
+                .isRequired(this.email, "Correo")
+                .isEmail(this.email, "Correo");
     }
 }

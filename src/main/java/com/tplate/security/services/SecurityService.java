@@ -84,17 +84,17 @@ public class SecurityService {
             return ResponseBuilder
                     .builder()
                     .ok()
-                    .message("Usuario logueado correctamente")
+                    .message("Se inicio sesión correctamente.")
                     .dto(user, UserDto.class)
                     .build();
 
         } catch (AuthenticationException e) {
-            return ResponseBuilder.buildConflict("Usuario o password incorrectos.");
+            return ResponseBuilder.buildConflict("Correo o contraseña incorrectos.");
         } catch (ValidatorException e) {
             return ResponseBuilder.buildConflict(e.getMessage());
         } catch (Exception e) {
             log.error("Error inesperado. {}, {}", e.getMessage(), e.getClass().getCanonicalName());
-            return ResponseBuilder.buildConflict("Error al loguear al usuario.");
+            return ResponseBuilder.buildConflict("Error al iniciar sesión.");
         }
     }
 
@@ -108,7 +108,7 @@ public class SecurityService {
             // Validacion acoplada a la DB
             if (!this.userRepository.existsByUsername(email)) {
                 log.error("Email inexistente, Se esta intentado resetear un password con un mail invalido. {}", email);
-                throw new BaseDtoException("Email no existe.");
+                throw new BaseDtoException("El correo electrónico no existe.");
             }
 
             // Generar y guardar el reset code
@@ -132,23 +132,23 @@ public class SecurityService {
             this.emailSenderService.send(Email.builder()
                     .to(email)
                     .resetCode(resetPassword.getCode())
-                    .subject("Reset Password Code")
+                    .subject("Código de recuperación de contraseña.")
                     .build());
 
             log.info("Envio de email para resetear el password OK. {}", email);
 
             return ResponseBuilder.builder()
                     .ok()
-                    .message("Se envio el codigo correctamente.")
+                    .message("Se envió el código de recuperación.")
                     .build();
         } catch (ValidatorException | BaseDtoException e) {
             return ResponseBuilder.buildConflict(e.getMessage());
         }catch ( MailSendException e){
             log.error("Error envio de email. {}, {}", e.getMessage(), e.getClass().getCanonicalName());
-            return ResponseBuilder.buildConflict("No se puede enviar el email en estos momentos.");
+            return ResponseBuilder.buildConflict("No se puede enviar el código en estos momentos.");
         }catch (Exception e) {
             log.error("Error inesperado. {}, {}", e.getMessage(), e.getClass().getCanonicalName());
-            return ResponseBuilder.buildConflict("Error inesperado. Consulte a Sistemas.");
+            return ResponseBuilder.buildConflict("Error inesperado.");
         }
     }
 
@@ -162,7 +162,7 @@ public class SecurityService {
             // Validacion acoplada a la DB
             if (!this.userRepository.existsByUsername(email)) {
                 log.error("Email inexistente, Se esta intentado resetear un password con un mail invalido. {}", email);
-                throw new BaseDtoException("Email inexistente.");
+                throw new BaseDtoException("Correo electrónico no existe.");
             }
 
             // Validacion del codigo de reseto
@@ -171,20 +171,20 @@ public class SecurityService {
                     .orElse(null);
             if (resetPassword == null) {
                 log.error("El email {}, no tiene asociado ningun codigo de reseto de password.", email);
-                throw new BaseDtoException("Codigo de recuperacion no existe.");
+                throw new BaseDtoException("Código de recuperación no existe.");
             }
 
             // Validacion de coincidencia del codigo
             if (!resetPassword.getCode().equals(resetPasswordDto.getCode())) {
                 log.error("El codigo de reseteo en la base {}, no coincide con el suministrado {}."
                         , resetPassword.getCode(), resetPasswordDto.getCode());
-                throw new BaseDtoException("Codigo de recuperacion incorrecto. ");
+                throw new BaseDtoException("Código de recuperación incorrecto. ");
             }
 
             // Validacion de expiracion del codigo
             if (! (new Date(System.currentTimeMillis()).before(resetPassword.getExpiration()))) {
                 log.error("El codigo de reseteo expiro {}.",resetPassword.getCode());
-                throw new BaseDtoException("Codigo de recuperacion ha expirado.");
+                throw new BaseDtoException("El código de recuperación ha expirado.");
             }
 
             // Persistencia del nuevo password
@@ -195,14 +195,14 @@ public class SecurityService {
 
             return ResponseBuilder.builder()
                     .ok()
-                    .message("Se modifico el password correctamente.")
+                    .message("Se modifico la contraseña.")
                     .build();
         } catch (ValidatorException | BaseDtoException e) {
             return ResponseBuilder.buildConflict(e.getMessage());
 
         } catch (Exception e) {
             log.error("Error inesperado. {}, {}", e.getMessage(), e.getClass().getCanonicalName());
-            return ResponseBuilder.buildConflict("Error inesperado. Consulte a Sistemas.");
+            return ResponseBuilder.buildConflict("Error inesperado.");
         }
     }
 
@@ -217,7 +217,7 @@ public class SecurityService {
             //Verificar que el username no exista
             if (this.userRepository.existsByUsername(singUpDto.getUsername())) {
                 log.error("Username existente. {}", singUpDto.getUsername());
-                throw new SignInException("Username existente.");
+                throw new SignInException("Correo electrónico existente.");
             }
             //Crear nuevo usuario
             User newUser = User.builder()
@@ -231,14 +231,14 @@ public class SecurityService {
             log.info("Usuario registrado OK. {}", singUpDto.getUsername());
             return ResponseBuilder.builder()
                     .ok()
-                    .message("Usuario registrado correctamente. " + newUser.getUsername())
+                    .message("Usuario registrado.  " + newUser.getUsername())
                     .build();
 
         } catch (SignInException | ValidatorException e) {
             return ResponseBuilder.buildConflict(e.getMessage());
         } catch (Exception e) {
             log.error("Error inesperado. {}, {}", e.getMessage(), e.getClass().getCanonicalName());
-            return ResponseBuilder.buildConflict("Error al registrar el usuario.");
+            return ResponseBuilder.buildConflict("Error al registrar usuario.");
         }
     }
 }

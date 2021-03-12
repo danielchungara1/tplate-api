@@ -14,8 +14,8 @@ public class LoginDto {
 
     public void validate() throws ValidatorException {
         Validator.evaluate()
-            .isRequired(this.username, "Username")
-            .isRequired(this.password, "Password")
-            .isEmail(this.username, "Username");
+            .isRequired(this.username, "Correo")
+            .isRequired(this.password, "Contraseña")
+            .isEmail(this.username, "Correo");
     }
 }

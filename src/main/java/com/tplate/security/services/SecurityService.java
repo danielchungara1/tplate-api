@@ -1,11 +1,12 @@
 package com.tplate.security.services;
 
+import com.google.common.collect.ImmutableMap;
 import com.tplate.exceptions.ValidatorException;
 import com.tplate.responses.builders.ResponseBuilder;
 import com.tplate.security.rol.RolRepository;
 import com.tplate.security.dtos.*;
 import com.tplate.security.email.Email;
-import com.tplate.security.email.EmailSenderService;
+import com.tplate.security.email.EmailService;
 import com.tplate.security.exceptions.BaseDtoException;
 import com.tplate.security.exceptions.SignInException;
 import com.tplate.security.jwt.JwtTokenUtil;
@@ -24,8 +25,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.net.UnknownHostException;
 import java.util.Date;
+import java.util.Map;
 import java.util.Random;
 
 @Service
@@ -45,7 +46,7 @@ public class SecurityService {
     JwtTokenUtil jwtTokenUtil;
 
     @Autowired
-    EmailSenderService emailSenderService;
+    EmailService emailServiceService;
 
     @Autowired
     RolRepository rolRepository;
@@ -129,24 +130,27 @@ public class SecurityService {
             this.resetCodeRepository.save(resetPassword);
 
             //Envio del mail
-            this.emailSenderService.send(Email.builder()
+            this.emailServiceService.send(Email.builder()
                     .to(email)
-                    .resetCode(resetPassword.getCode())
-                    .subject("Código de recuperación de contraseña.")
+                    .subject("Código para cambio de contraseña.")
+                    .data(ImmutableMap.<String, Object>builder()
+                            .put("resetCode", resetPassword.getCode())
+                            .build()
+                    )
                     .build());
 
             log.info("Envio de email para resetear el password OK. {}", email);
 
             return ResponseBuilder.builder()
                     .ok()
-                    .message("Se envió el código de recuperación.")
+                    .message("Se envió el código para el cambio de contraseña.")
                     .build();
         } catch (ValidatorException | BaseDtoException e) {
             return ResponseBuilder.buildConflict(e.getMessage());
-        }catch ( MailSendException e){
+        } catch (MailSendException e) {
             log.error("Error envio de email. {}, {}", e.getMessage(), e.getClass().getCanonicalName());
             return ResponseBuilder.buildConflict("No se puede enviar el código en estos momentos.");
-        }catch (Exception e) {
+        } catch (Exception e) {
             log.error("Error inesperado. {}, {}", e.getMessage(), e.getClass().getCanonicalName());
             return ResponseBuilder.buildConflict("Error inesperado.");
         }
@@ -171,20 +175,20 @@ public class SecurityService {
                     .orElse(null);
             if (resetPassword == null) {
                 log.error("El email {}, no tiene asociado ningun codigo de reseto de password.", email);
-                throw new BaseDtoException("Código de recuperación no existe.");
+                throw new BaseDtoException("Código no existente.");
             }
 
             // Validacion de coincidencia del codigo
             if (!resetPassword.getCode().equals(resetPasswordDto.getCode())) {
                 log.error("El codigo de reseteo en la base {}, no coincide con el suministrado {}."
                         , resetPassword.getCode(), resetPasswordDto.getCode());
-                throw new BaseDtoException("Código de recuperación incorrecto. ");
+                throw new BaseDtoException("Código incorrecto. ");
             }
 
             // Validacion de expiracion del codigo
-            if (! (new Date(System.currentTimeMillis()).before(resetPassword.getExpiration()))) {
-                log.error("El codigo de reseteo expiro {}.",resetPassword.getCode());
-                throw new BaseDtoException("El código de recuperación ha expirado.");
+            if (!(new Date(System.currentTimeMillis()).before(resetPassword.getExpiration()))) {
+                log.error("El codigo de reseteo expiro {}.", resetPassword.getCode());
+                throw new BaseDtoException("El código ha expirado.");
             }
 
             // Persistencia del nuevo password

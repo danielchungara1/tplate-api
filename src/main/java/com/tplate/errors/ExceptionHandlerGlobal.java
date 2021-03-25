@@ -3,6 +3,7 @@ package com.tplate.errors;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.tplate.responses.builders.ResponseEntityBuilder;
 import com.tplate.util.JsonUtil;
+import com.tplate.util.StringUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -25,8 +26,7 @@ public class ExceptionHandlerGlobal {
     @ResponseBody
     public ResponseEntity handleBusinessValidationException(HttpMessageNotReadableException exception) throws JsonProcessingException {
         log.error(exception.getMessage());
-        ErrorResponse errorResponse = new ErrorResponse(exception);
-        return ResponseEntityBuilder.buildBadRequest("Check the data sent. " + errorResponse.getMessage());
+        return ResponseEntityBuilder.buildBadRequest("Check the data sent. " + StringUtil.truncate(exception.getMessage(), ":"));
     }
 
     // Not Found ( 404 )

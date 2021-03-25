@@ -78,6 +78,14 @@ public class  ResponseEntityBuilder {
                 .build();
     }
 
+    public static ResponseEntity buildInternalServerError(String message) {
+        return ResponseEntityBuilder
+                .builder()
+                .statusCode__internalServerError()
+                .message(message)
+                .build();
+    }
+
 //    **************************************************************************
 //    * Shortcuts Status Codes
 //    **************************************************************************
@@ -102,7 +110,10 @@ public class  ResponseEntityBuilder {
         return this;
     }
 
-
+    public ResponseEntityBuilder statusCode__internalServerError() {
+        this.statusCode = HttpStatus.NOT_FOUND;
+        return this;
+    }
 
 
 }

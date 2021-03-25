@@ -63,7 +63,6 @@ public class SecurityService {
     public ResponseEntity loguear(LoginDto loginDto) {
 
         try {
-
             //Validate Dto
             loginDto.validate();
 

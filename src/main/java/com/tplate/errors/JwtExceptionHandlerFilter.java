@@ -2,7 +2,9 @@ package com.tplate.errors;
 
 import com.tplate.responses.builders.ResponseEntityBuilder;
 import com.tplate.util.JsonUtil;
+import com.tplate.util.StringUtil;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,29 +19,29 @@ import java.io.IOException;
 
 @Log4j2
 @Component
-public class ExceptionHandlerFilter extends OncePerRequestFilter {
+public class JwtExceptionHandlerFilter extends OncePerRequestFilter {
 
     @Override
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             filterChain.doFilter(request, response);
-        }catch (ExpiredJwtException e){
-            log.error("Token has expired. {}", e.getClass().getCanonicalName());
+
+        } catch (ExpiredJwtException e){
+            log.error("JWT exception. {}", e.getClass().getCanonicalName());
 
             response.setContentType("application/json");
             response.setStatus(HttpStatus.BAD_REQUEST.value());
 
-            ResponseEntity r = ResponseEntityBuilder.buildBadRequest("JWT has expired.");
+            ResponseEntity r = ResponseEntityBuilder.buildBadRequest("Session has finished.");
             response.getWriter().write(JsonUtil.convertObjectToJson(r.getBody()));
 
-        }
-        catch (Exception e) {
-            log.error("Internal Server Error. {}", e.getClass().getCanonicalName());
+        } catch (Exception e){
+            log.error("JWT exception. {}", e.getClass().getCanonicalName());
 
             response.setContentType("application/json");
-            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
 
-            ResponseEntity r = ResponseEntityBuilder.buildInternalServerError("Internal Server Error.");
+            ResponseEntity r = ResponseEntityBuilder.buildBadRequest(StringUtil.truncate(e.getMessage(), ":"));
             response.getWriter().write(JsonUtil.convertObjectToJson(r.getBody()));
 
         }

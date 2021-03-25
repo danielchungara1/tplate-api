@@ -86,6 +86,14 @@ public class  ResponseEntityBuilder {
                 .build();
     }
 
+    public static ResponseEntity buildForbidden(String message) {
+        return ResponseEntityBuilder
+                .builder()
+                .statusCode__forbidden()
+                .message(message)
+                .build();
+    }
+
 //    **************************************************************************
 //    * Shortcuts Status Codes
 //    **************************************************************************
@@ -112,6 +120,11 @@ public class  ResponseEntityBuilder {
 
     public ResponseEntityBuilder statusCode__internalServerError() {
         this.statusCode = HttpStatus.NOT_FOUND;
+        return this;
+    }
+
+    public ResponseEntityBuilder statusCode__forbidden() {
+        this.statusCode = HttpStatus.FORBIDDEN;
         return this;
     }
 

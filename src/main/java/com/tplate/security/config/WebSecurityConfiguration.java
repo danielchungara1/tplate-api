@@ -1,6 +1,6 @@
 package com.tplate.security.config;
 
-import com.tplate.errors.ExceptionHandlerFilter;
+import com.tplate.errors.JwtExceptionHandlerFilter;
 import com.tplate.security.jwt.JwtAuthorizationFilter;
 import com.tplate.security.jwt.JwtUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     JwtUserDetailsService jwtUserDetailsService;
 
     @Autowired
-    ExceptionHandlerFilter exceptionHandlerFilter;
+    JwtExceptionHandlerFilter jwtExceptionHandlerFilter;
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
@@ -64,7 +64,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/user/*").authenticated();
         //Apply JWT
         http.addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
-        http.addFilterBefore(exceptionHandlerFilter, JwtAuthorizationFilter.class);
+        http.addFilterBefore(jwtExceptionHandlerFilter, JwtAuthorizationFilter.class);
     }
 
     @Bean

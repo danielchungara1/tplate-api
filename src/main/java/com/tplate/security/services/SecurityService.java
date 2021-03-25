@@ -83,7 +83,7 @@ public class SecurityService {
             return ResponseEntityBuilder
                     .builder()
                     .statusCode__ok()
-                    .message("Se inicio sesión correctamente.")
+                    .message("Session started successfully.")
                     .dto(user, UserDto.class)
                     .build();
 

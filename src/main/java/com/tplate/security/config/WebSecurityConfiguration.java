@@ -18,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
+
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
@@ -42,7 +43,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         // We don't need CSRF for this example
-        http.csrf().disable().cors();
+        http.cors().and().csrf().disable();
 
         // Allow same origin for X-Frame-Options on the server
         http.headers().frameOptions().sameOrigin();
@@ -58,9 +59,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.OPTIONS, "*").permitAll()
                 .antMatchers("/api/security/login").permitAll()
                 .antMatchers("/api/security/sign-up").permitAll()
-                .antMatchers("/api/security/reset-password/**").permitAll()
+                .antMatchers("/api/security/reset-password/*").permitAll()
                 // Disallow everything else..
-                .anyRequest().authenticated();
+                .antMatchers("/api/user/*").authenticated();
         //Apply JWT
         http.addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(exceptionHandlerFilter, JwtAuthorizationFilter.class);

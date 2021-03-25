@@ -2,7 +2,7 @@ package com.tplate.security.services;
 
 import com.google.common.collect.ImmutableMap;
 import com.tplate.exceptions.ValidatorException;
-import com.tplate.responses.builders.ResponseBuilder;
+import com.tplate.responses.builders.ResponseEntityBuilder;
 import com.tplate.security.rol.RolRepository;
 import com.tplate.security.dtos.*;
 import com.tplate.security.email.Email;
@@ -26,7 +26,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
-import java.util.Map;
 import java.util.Random;
 
 @Service
@@ -82,20 +81,20 @@ public class SecurityService {
             log.info("Usuario logueado OK. {}", loginDto.getUsername());
 
             //Response
-            return ResponseBuilder
+            return ResponseEntityBuilder
                     .builder()
-                    .ok()
+                    .statusCode__ok()
                     .message("Se inicio sesión correctamente.")
                     .dto(user, UserDto.class)
                     .build();
 
         } catch (AuthenticationException e) {
-            return ResponseBuilder.buildConflict("Correo o contraseña incorrectos.");
+            return ResponseEntityBuilder.buildConflict("Correo o contraseña incorrectos.");
         } catch (ValidatorException e) {
-            return ResponseBuilder.buildConflict(e.getMessage());
+            return ResponseEntityBuilder.buildConflict(e.getMessage());
         } catch (Exception e) {
             log.error("Error inesperado. {}, {}", e.getMessage(), e.getClass().getCanonicalName());
-            return ResponseBuilder.buildConflict("Error al iniciar sesión.");
+            return ResponseEntityBuilder.buildConflict("Error al iniciar sesión.");
         }
     }
 
@@ -141,18 +140,18 @@ public class SecurityService {
 
             log.info("Envio de email para resetear el password OK. {}", email);
 
-            return ResponseBuilder.builder()
-                    .ok()
+            return ResponseEntityBuilder.builder()
+                    .statusCode__ok()
                     .message("Se envió el código para el cambio de contraseña.")
                     .build();
         } catch (ValidatorException | BaseDtoException e) {
-            return ResponseBuilder.buildConflict(e.getMessage());
+            return ResponseEntityBuilder.buildConflict(e.getMessage());
         } catch (MailSendException e) {
             log.error("Error envio de email. {}, {}", e.getMessage(), e.getClass().getCanonicalName());
-            return ResponseBuilder.buildConflict("No se puede enviar el código en estos momentos.");
+            return ResponseEntityBuilder.buildConflict("No se puede enviar el código en estos momentos.");
         } catch (Exception e) {
             log.error("Error inesperado. {}, {}", e.getMessage(), e.getClass().getCanonicalName());
-            return ResponseBuilder.buildConflict("Error inesperado.");
+            return ResponseEntityBuilder.buildConflict("Error inesperado.");
         }
     }
 
@@ -197,16 +196,16 @@ public class SecurityService {
             userRepository.save(user);
             log.info("Reseto de password exitoso. Usuario {}", user.getUsername());
 
-            return ResponseBuilder.builder()
-                    .ok()
+            return ResponseEntityBuilder.builder()
+                    .statusCode__ok()
                     .message("Se modifico la contraseña.")
                     .build();
         } catch (ValidatorException | BaseDtoException e) {
-            return ResponseBuilder.buildConflict(e.getMessage());
+            return ResponseEntityBuilder.buildConflict(e.getMessage());
 
         } catch (Exception e) {
             log.error("Error inesperado. {}, {}", e.getMessage(), e.getClass().getCanonicalName());
-            return ResponseBuilder.buildConflict("Error inesperado.");
+            return ResponseEntityBuilder.buildConflict("Error inesperado.");
         }
     }
 
@@ -233,16 +232,16 @@ public class SecurityService {
 
             //Response
             log.info("Usuario registrado OK. {}", singUpDto.getUsername());
-            return ResponseBuilder.builder()
-                    .ok()
+            return ResponseEntityBuilder.builder()
+                    .statusCode__ok()
                     .message("Usuario registrado.  " + newUser.getUsername())
                     .build();
 
         } catch (SignInException | ValidatorException e) {
-            return ResponseBuilder.buildConflict(e.getMessage());
+            return ResponseEntityBuilder.buildConflict(e.getMessage());
         } catch (Exception e) {
             log.error("Error inesperado. {}, {}", e.getMessage(), e.getClass().getCanonicalName());
-            return ResponseBuilder.buildConflict("Error al registrar usuario.");
+            return ResponseEntityBuilder.buildConflict("Error al registrar usuario.");
         }
     }
 }

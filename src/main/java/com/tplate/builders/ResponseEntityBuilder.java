@@ -1,6 +1,6 @@
-package com.tplate.responses.builders;
+package com.tplate.builders;
 
-import com.tplate.responses.dtos.ResponseDto;
+import com.tplate.dtos.ResponseDto;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

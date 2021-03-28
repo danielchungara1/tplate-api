@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 // Internal Dependencies
 import com.tplate.exceptions.FormValidatorException;
-import com.tplate.responses.builders.ResponseEntityBuilder;
+import com.tplate.builders.ResponseEntityBuilder;
 import com.tplate.security.rol.RolRepository;
 import com.tplate.security.dtos.*;
 import com.tplate.security.email.Email;

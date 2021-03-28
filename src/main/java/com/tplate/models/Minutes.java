@@ -1,4 +1,4 @@
-package com.tplate.util;
+package com.tplate.models;
 
 import lombok.Data;
 

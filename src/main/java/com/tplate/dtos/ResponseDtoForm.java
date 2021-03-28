@@ -1,4 +1,4 @@
-package com.tplate.responses.dtos;
+package com.tplate.dtos;
 
 import lombok.Data;
 

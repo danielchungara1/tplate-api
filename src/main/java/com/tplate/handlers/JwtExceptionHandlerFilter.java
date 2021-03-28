@@ -1,10 +1,9 @@
-package com.tplate.errors;
+package com.tplate.handlers;
 
-import com.tplate.responses.builders.ResponseEntityBuilder;
+import com.tplate.builders.ResponseEntityBuilder;
 import com.tplate.util.JsonUtil;
 import com.tplate.util.StringUtil;
 import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.MalformedJwtException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

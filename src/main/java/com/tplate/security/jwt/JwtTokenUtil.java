@@ -2,7 +2,7 @@ package com.tplate.security.jwt;
 
 import com.tplate.security.constants.SecurityConstants;
 import com.tplate.users.models.User;
-import com.tplate.util.Minutes;
+import com.tplate.models.Minutes;
 import com.tplate.util.TimeUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

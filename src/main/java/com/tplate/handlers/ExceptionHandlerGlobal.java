@@ -1,12 +1,9 @@
-package com.tplate.errors;
+package com.tplate.handlers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.tplate.responses.builders.ResponseEntityBuilder;
-import com.tplate.util.JsonUtil;
+import com.tplate.builders.ResponseEntityBuilder;
 import com.tplate.util.StringUtil;
-import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;

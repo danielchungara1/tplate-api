@@ -49,7 +49,7 @@ public class  ResponseEntityBuilder {
     public static ResponseEntity buildConflict(String message) {
         return ResponseEntityBuilder
                 .builder()
-                .statusCode__conflict()
+                .conflict()
                 .message(message)
                 .build();
     }
@@ -57,7 +57,7 @@ public class  ResponseEntityBuilder {
     public static ResponseEntity buildBadRequest(String message) {
         return ResponseEntityBuilder
                 .builder()
-                .statusCode__badRequest()
+                .badRequest()
                 .message(message)
                 .build();
     }
@@ -65,7 +65,7 @@ public class  ResponseEntityBuilder {
     public static ResponseEntity buildOk(String message) {
         return ResponseEntityBuilder
                 .builder()
-                .statusCode__ok()
+                .ok()
                 .message(message)
                 .build();
     }
@@ -73,7 +73,7 @@ public class  ResponseEntityBuilder {
     public static ResponseEntity buildNotFound(String message) {
         return ResponseEntityBuilder
                 .builder()
-                .statusCode__notFound()
+                .notFound()
                 .message(message)
                 .build();
     }
@@ -81,7 +81,7 @@ public class  ResponseEntityBuilder {
     public static ResponseEntity buildInternalServerError(String message) {
         return ResponseEntityBuilder
                 .builder()
-                .statusCode__internalServerError()
+                .internalServerError()
                 .message(message)
                 .build();
     }
@@ -89,41 +89,50 @@ public class  ResponseEntityBuilder {
     public static ResponseEntity buildForbidden(String message) {
         return ResponseEntityBuilder
                 .builder()
-                .statusCode__forbidden()
+                .forbidden()
                 .message(message)
                 .build();
     }
 
+    public static ResponseEntity buildSomethingWrong() {
+        return ResponseEntityBuilder
+                .builder()
+                .conflict()
+                .message("Something went wrong.")
+                .build();
+    }
+
+
 //    **************************************************************************
-//    * Shortcuts Status Codes
+//    * Shortcuts Status Code
 //    **************************************************************************
 
-    public ResponseEntityBuilder statusCode__badRequest() {
+    public ResponseEntityBuilder badRequest() {
         this.statusCode = HttpStatus.BAD_REQUEST;
         return this;
     }
 
-    public ResponseEntityBuilder statusCode__ok() {
+    public ResponseEntityBuilder ok() {
         this.statusCode = HttpStatus.OK;
         return this;
     }
 
-    public ResponseEntityBuilder statusCode__conflict() {
+    public ResponseEntityBuilder conflict() {
         this.statusCode = HttpStatus.CONFLICT;
         return this;
     }
 
-    public ResponseEntityBuilder statusCode__notFound() {
+    public ResponseEntityBuilder notFound() {
         this.statusCode = HttpStatus.NOT_FOUND;
         return this;
     }
 
-    public ResponseEntityBuilder statusCode__internalServerError() {
+    public ResponseEntityBuilder internalServerError() {
         this.statusCode = HttpStatus.NOT_FOUND;
         return this;
     }
 
-    public ResponseEntityBuilder statusCode__forbidden() {
+    public ResponseEntityBuilder forbidden() {
         this.statusCode = HttpStatus.FORBIDDEN;
         return this;
     }

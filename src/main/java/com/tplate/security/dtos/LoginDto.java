@@ -1,7 +1,7 @@
 package com.tplate.security.dtos;
 
-import com.tplate.exceptions.ValidatorException;
-import com.tplate.validators.Validator;
+import com.tplate.exceptions.FormValidatorException;
+import com.tplate.validators.FormValidator;
 import lombok.Data;
 import lombok.ToString;
 
@@ -12,10 +12,9 @@ public class LoginDto {
     private String username;
     private String password;
 
-    public void validate() throws ValidatorException {
-        Validator.evaluate()
-            .isRequired(this.username, "Correo")
-            .isRequired(this.password, "Contraseña")
-            .isEmail(this.username, "Correo");
+    public void validate() throws FormValidatorException {
+        FormValidator.evaluate()
+            .isRequired(this.username, "Username")
+            .isRequired(this.password, "Password");
     }
 }

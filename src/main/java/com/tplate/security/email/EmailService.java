@@ -42,11 +42,11 @@ public class EmailService {
             helper.setSubject(email.getSubject());
             helper.setText(templateContent, true);
             javaMailSender.send(mimeMessage);
-            log.info("Se envio el email correctamente.");
+            log.info("Email was sent successfully");
 
         } catch (Exception e) {
-            log.error("No se envio el email. {}", e.getClass().getCanonicalName());
-            throw new MailSendException("No se pudo enviar el email.");
+            log.error("Email wasn't sent. {}", e.getClass().getCanonicalName());
+            throw new MailSendException("Email wasn't sent.");
 
         }
 

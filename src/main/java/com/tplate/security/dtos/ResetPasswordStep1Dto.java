@@ -1,7 +1,7 @@
 package com.tplate.security.dtos;
 
-import com.tplate.exceptions.ValidatorException;
-import com.tplate.validators.Validator;
+import com.tplate.exceptions.FormValidatorException;
+import com.tplate.validators.FormValidator;
 import lombok.Data;
 import lombok.ToString;
 
@@ -10,9 +10,9 @@ import lombok.ToString;
 public class ResetPasswordStep1Dto {
     private String email;
 
-    public void validate() throws ValidatorException {
-        Validator.evaluate()
-                .isRequired(this.email, "Correo")
-                .isEmail(this.email, "Correo");
+    public void validate() throws FormValidatorException {
+        FormValidator.evaluate()
+                .isRequired(this.email, "Email")
+                .isEmail(this.email, "Email");
     }
 }

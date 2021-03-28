@@ -1,20 +1,10 @@
 package com.tplate.security.services;
 
+// External Dependencies
 import com.google.common.collect.ImmutableMap;
-import com.tplate.exceptions.ValidatorException;
-import com.tplate.responses.builders.ResponseEntityBuilder;
-import com.tplate.security.rol.RolRepository;
-import com.tplate.security.dtos.*;
-import com.tplate.security.email.Email;
-import com.tplate.security.email.EmailService;
-import com.tplate.security.exceptions.BaseDtoException;
-import com.tplate.security.exceptions.SignInException;
-import com.tplate.security.jwt.JwtTokenUtil;
-import com.tplate.security.models.ResetPassword;
-import com.tplate.security.repositories.ResetCodeRepository;
-import com.tplate.user.User;
-import com.tplate.user.UserRepository;
+import com.tplate.security.exceptions.*;
 import lombok.extern.log4j.Log4j2;
+import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailSendException;
@@ -25,8 +15,18 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.Random;
+// Internal Dependencies
+import com.tplate.exceptions.FormValidatorException;
+import com.tplate.responses.builders.ResponseEntityBuilder;
+import com.tplate.security.rol.RolRepository;
+import com.tplate.security.dtos.*;
+import com.tplate.security.email.Email;
+import com.tplate.security.email.EmailService;
+import com.tplate.security.jwt.JwtTokenUtil;
+import com.tplate.security.models.ResetPassword;
+import com.tplate.security.repositories.ResetCodeRepository;
+import com.tplate.user.User;
+import com.tplate.user.UserRepository;
 
 @Service
 @Log4j2
@@ -45,7 +45,7 @@ public class SecurityService {
     JwtTokenUtil jwtTokenUtil;
 
     @Autowired
-    EmailService emailServiceService;
+    EmailService emailService;
 
     @Autowired
     RolRepository rolRepository;
@@ -56,155 +56,161 @@ public class SecurityService {
     @Autowired
     ResetPasswordService resetPasswordService;
 
-    //Miscelaneos
-    private Random rand = new Random();
-
     @Transactional
     public ResponseEntity loguear(LoginDto loginDto) {
 
         try {
-            //Validate Dto
+            // Validate Dto
             loginDto.validate();
 
-            //Verificar que el usuario exista en la BD y coincida el password
+            // Credentials Validation
             this.authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             loginDto.getUsername(), loginDto.getPassword()
                     )
             );
 
-            //Generar token
+            // Generate token
             String token = this.jwtTokenUtil.generateToken(this.userRepository.findByUsername(loginDto.getUsername()).get());
             User user = this.userRepository.findByUsername(loginDto.getUsername()).get();
             user.setToken(token);
-            log.info("Usuario logueado OK. {}", loginDto.getUsername());
+            log.info("User logged OK. {}", loginDto.getUsername());
 
             //Response
             return ResponseEntityBuilder
                     .builder()
-                    .statusCode__ok()
+                    .ok()
                     .message("Session started successfully.")
                     .dto(user, UserDto.class)
                     .build();
 
         } catch (AuthenticationException e) {
-            return ResponseEntityBuilder.buildConflict("Correo o contraseña incorrectos.");
-        } catch (ValidatorException e) {
+            return ResponseEntityBuilder.buildConflict("Invalid Credentials.");
+
+        } catch (FormValidatorException e) {
             return ResponseEntityBuilder.buildConflict(e.getMessage());
+
         } catch (Exception e) {
-            log.error("Error inesperado. {}, {}", e.getMessage(), e.getClass().getCanonicalName());
-            return ResponseEntityBuilder.buildConflict("Error al iniciar sesión.");
+            log.error("Unexpected Error. {}, {}", e.getMessage(), e.getClass().getCanonicalName());
+            return ResponseEntityBuilder.buildSomethingWrong();
         }
     }
 
     @Transactional
     public ResponseEntity resetPasswordStep1(ResetPasswordStep1Dto resetPasswordDto) {
+
         try {
-            // Validacion Dto
+
+            // Dto Validation
             resetPasswordDto.validate();
             String email = resetPasswordDto.getEmail();
 
-            // Validacion acoplada a la DB
+            // Existence Validation
             if (!this.userRepository.existsByUsername(email)) {
-                log.error("Email inexistente, Se esta intentado resetear un password con un mail invalido. {}", email);
-                throw new BaseDtoException("El correo electrónico no existe.");
+                log.error("Email not found. {}", email);
+                throw new EmailNotFoundException();
             }
 
-            // Generar y guardar el reset code
+            // Generate Reset Code
             ResetPassword resetPassword = this.resetCodeRepository
                     .findByUser(this.userRepository.findByUsername(email).get())
                     .orElse(null);
+            // If not exists reset code then I create it.
             if (resetPassword == null) {
                 resetPassword = ResetPassword.builder()
                         .code(this.resetPasswordService.code())
                         .expiration(this.resetPasswordService.expiration())
                         .user(this.userRepository.findByUsername(email).get())
                         .build();
-            } else {
+            } else { // If already exists then only I update it.
                 resetPassword.setCode(this.resetPasswordService.code());
                 resetPassword.setExpiration(this.resetPasswordService.expiration());
             }
-
             this.resetCodeRepository.save(resetPassword);
 
-            //Envio del mail
-            this.emailServiceService.send(Email.builder()
+            // Send email
+            this.emailService.send(Email.builder()
                     .to(email)
-                    .subject("Código para cambio de contraseña.")
+                    .subject("Reset Code for change password.")
                     .data(ImmutableMap.<String, Object>builder()
                             .put("resetCode", resetPassword.getCode())
                             .build()
                     )
                     .build());
 
-            log.info("Envio de email para resetear el password OK. {}", email);
+            log.info("Email with the reset code was sent successfully. {}", email);
 
             return ResponseEntityBuilder.builder()
-                    .statusCode__ok()
-                    .message("Se envió el código para el cambio de contraseña.")
+                    .ok()
+                    .message("Email was sent successfully.")
                     .build();
-        } catch (ValidatorException | BaseDtoException e) {
+
+        } catch (FormValidatorException | EmailNotFoundException e) {
             return ResponseEntityBuilder.buildConflict(e.getMessage());
+
         } catch (MailSendException e) {
-            log.error("Error envio de email. {}, {}", e.getMessage(), e.getClass().getCanonicalName());
-            return ResponseEntityBuilder.buildConflict("No se puede enviar el código en estos momentos.");
+            log.error("Email wasn't sent. {}, {}", e.getMessage(), e.getClass().getCanonicalName());
+            return ResponseEntityBuilder.buildConflict(e.getMessage());
+
         } catch (Exception e) {
-            log.error("Error inesperado. {}, {}", e.getMessage(), e.getClass().getCanonicalName());
-            return ResponseEntityBuilder.buildConflict("Error inesperado.");
+            log.error("Unexpected Error. {}, {}", e.getMessage(), e.getClass().getCanonicalName());
+            return ResponseEntityBuilder.buildSomethingWrong();
         }
     }
 
     @Transactional
     public ResponseEntity resetPasswordStep2(ResetPasswordStep2Dto resetPasswordDto) {
         try {
-            // Validacion Dto
+            // Dto Validation
             resetPasswordDto.validate();
             String email = resetPasswordDto.getEmail();
 
-            // Validacion acoplada a la DB
+            // Validate existence
             if (!this.userRepository.existsByUsername(email)) {
-                log.error("Email inexistente, Se esta intentado resetear un password con un mail invalido. {}", email);
-                throw new BaseDtoException("Correo electrónico no existe.");
+                log.error("Email not exist. {}", email);
+                throw new EmailNotFoundException();
             }
 
-            // Validacion del codigo de reseto
+            // Validate reset code
             ResetPassword resetPassword = this.resetCodeRepository
                     .findByUser(this.userRepository.findByUsername(email).get())
                     .orElse(null);
             if (resetPassword == null) {
-                log.error("El email {}, no tiene asociado ningun codigo de reseto de password.", email);
-                throw new BaseDtoException("Código no existente.");
+                log.error("Reset code not found for email {}", email);
+                throw new ResetCodeNotFoundException();
             }
 
-            // Validacion de coincidencia del codigo
+            // Validate matching
             if (!resetPassword.getCode().equals(resetPasswordDto.getCode())) {
-                log.error("El codigo de reseteo en la base {}, no coincide con el suministrado {}."
+                log.error("Codes not matching {} {}."
                         , resetPassword.getCode(), resetPasswordDto.getCode());
-                throw new BaseDtoException("Código incorrecto. ");
+                throw new ResetCodeNotMatchingException();
             }
 
-            // Validacion de expiracion del codigo
+            // Validate expiration
             if (!(new Date(System.currentTimeMillis()).before(resetPassword.getExpiration()))) {
-                log.error("El codigo de reseteo expiro {}.", resetPassword.getCode());
-                throw new BaseDtoException("El código ha expirado.");
+                log.error("Code has expired {}.", resetPassword.getCode());
+                throw new ResetCodeExpiredException();
             }
 
-            // Persistencia del nuevo password
+            // Save new password
             User user = this.userRepository.findByUsername(resetPasswordDto.getEmail()).get();
             user.setPassword(passwordEncoder.encode(resetPasswordDto.getPassword()));
             userRepository.save(user);
-            log.info("Reseto de password exitoso. Usuario {}", user.getUsername());
+            log.info("The new password has been saved. User {}", user.getUsername());
 
             return ResponseEntityBuilder.builder()
-                    .statusCode__ok()
-                    .message("Se modifico la contraseña.")
+                    .ok()
+                    .message("The password has been changed.")
                     .build();
-        } catch (ValidatorException | BaseDtoException e) {
+        } catch ( FormValidatorException | ResetCodeNotFoundException
+                | EmailNotFoundException | ResetCodeNotMatchingException
+                | ResetCodeExpiredException e ) {
             return ResponseEntityBuilder.buildConflict(e.getMessage());
 
         } catch (Exception e) {
-            log.error("Error inesperado. {}, {}", e.getMessage(), e.getClass().getCanonicalName());
-            return ResponseEntityBuilder.buildConflict("Error inesperado.");
+            log.error("Something was wrong. {}, {}", e.getMessage(), e.getClass().getCanonicalName());
+            return ResponseEntityBuilder.buildSomethingWrong();
         }
     }
 
@@ -213,15 +219,16 @@ public class SecurityService {
 
         try {
 
-            //Validacion campos no nulos
+            // Validate dto
             singUpDto.validate();
 
-            //Verificar que el username no exista
+            // Validate username existence
             if (this.userRepository.existsByUsername(singUpDto.getUsername())) {
-                log.error("Username existente. {}", singUpDto.getUsername());
-                throw new SignInException("Correo electrónico existente.");
+                log.error("Username exists. {}", singUpDto.getUsername());
+                throw new UsernameExistsException();
             }
-            //Crear nuevo usuario
+
+            // Save new user
             User newUser = User.builder()
                     .username(singUpDto.getUsername())
                     .password(this.passwordEncoder.encode(singUpDto.getPassword()))
@@ -229,18 +236,18 @@ public class SecurityService {
                     .build();
             this.userRepository.save(newUser);
 
-            //Response
-            log.info("Usuario registrado OK. {}", singUpDto.getUsername());
+            // Response
+            log.info("User was registered. {}", singUpDto.getUsername());
             return ResponseEntityBuilder.builder()
-                    .statusCode__ok()
-                    .message("Usuario registrado.  " + newUser.getUsername())
+                    .ok()
+                    .message("User was registered.  " + newUser.getUsername())
                     .build();
 
-        } catch (SignInException | ValidatorException e) {
+        } catch (FormValidatorException | UsernameExistsException e) {
             return ResponseEntityBuilder.buildConflict(e.getMessage());
         } catch (Exception e) {
-            log.error("Error inesperado. {}, {}", e.getMessage(), e.getClass().getCanonicalName());
-            return ResponseEntityBuilder.buildConflict("Error al registrar usuario.");
+            log.error("Something went wrong. {}, {}", e.getMessage(), e.getClass().getCanonicalName());
+            return ResponseEntityBuilder.buildSomethingWrong();
         }
     }
 }

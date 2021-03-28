@@ -81,7 +81,7 @@ public class SecurityService {
                     .builder()
                     .ok()
                     .message("Session started successfully.")
-                    .dto(user, UserDto.class)
+                    .dto(user, UserLoggedDto.class)
                     .build();
 
         } catch (AuthenticationException e) {

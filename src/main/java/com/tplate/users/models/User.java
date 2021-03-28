@@ -37,8 +37,11 @@ public class User {
     @Column(name = "LASTNAME")
     private String lastname;
 
-    @Column(name = "TELEFONO")
-    private String telefono;
+    @Column(name = "PHONE")
+    private String phone;
+
+    @Column(name = "EMAIL")
+    private String email;
 
     @Transient
     private String token;

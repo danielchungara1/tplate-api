@@ -30,12 +30,16 @@ public class UserService {
             User user = this.userRepository.getOne(idUser);
             user.setName(userProfileDto.getName());
             user.setLastname(userProfileDto.getLastname());
-            user.setTelefono(userProfileDto.getTelefono());
-            this.userRepository.save(user);
+            user.setPhone(userProfileDto.getPhone());
+            user.setEmail(userProfileDto.getEmail());
+            User user_ = this.userRepository.save(user);
 
             // Response
-            return ResponseEntityBuilder.buildOk("Profile edited.");
-
+            return ResponseEntityBuilder.builder()
+                    .ok()
+                    .dto(user_, UserProfileDto.class)
+                    .message("Profile edited.")
+                    .build();
         } catch (UserNotFoundException e) {
             log.error("User not found. {}", e.getMessage());
             return ResponseEntityBuilder.buildBadRequest(e.getMessage());

@@ -1,5 +1,7 @@
-package com.tplate.user;
+package com.tplate.users.controllers;
 
+import com.tplate.users.dtos.UserProfileDto;
+import com.tplate.users.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,7 +16,7 @@ public class UserController {
 
     @PostMapping(value = "/profile/edit/{idUser}")
     @PreAuthorize("hasAuthority('EDITAR_PERFIL')")
-    public ResponseEntity login(@RequestBody(required=true) UserProfileDto userProfileDto,
+    public ResponseEntity editProfile(@RequestBody(required=true) UserProfileDto userProfileDto,
                                 @PathVariable Long idUser){
         return this.userService.editProfile(userProfileDto, idUser);
     }

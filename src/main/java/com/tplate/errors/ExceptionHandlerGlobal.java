@@ -62,7 +62,7 @@ public class ExceptionHandlerGlobal {
     @ResponseBody
     public ResponseEntity handleGenericException(Exception e, WebRequest request) {
         log.error(e.getMessage());
-        return ResponseEntityBuilder.buildBadRequest(StringUtil.truncate(e.getMessage(), ":"));
+        return ResponseEntityBuilder.buildInternalServerError(StringUtil.truncate(e.getMessage(), ";"));
 
     }
 }

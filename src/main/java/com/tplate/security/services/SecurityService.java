@@ -25,8 +25,8 @@ import com.tplate.security.email.EmailService;
 import com.tplate.security.jwt.JwtTokenUtil;
 import com.tplate.security.models.ResetPassword;
 import com.tplate.security.repositories.ResetCodeRepository;
-import com.tplate.user.User;
-import com.tplate.user.UserRepository;
+import com.tplate.users.models.User;
+import com.tplate.users.repositories.UserRepository;
 
 @Service
 @Log4j2

@@ -97,8 +97,16 @@ public class  ResponseEntityBuilder {
     public static ResponseEntity buildSomethingWrong() {
         return ResponseEntityBuilder
                 .builder()
-                .conflict()
+                .internalServerError()
                 .message("Something went wrong.")
+                .build();
+    }
+
+    public static ResponseEntity buildSomethingWrong(String details) {
+        return ResponseEntityBuilder
+                .builder()
+                .internalServerError()
+                .message("Something went wrong. " + details)
                 .build();
     }
 
@@ -128,7 +136,7 @@ public class  ResponseEntityBuilder {
     }
 
     public ResponseEntityBuilder internalServerError() {
-        this.statusCode = HttpStatus.NOT_FOUND;
+        this.statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
         return this;
     }
 

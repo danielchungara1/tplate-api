@@ -1,6 +1,6 @@
 package com.tplate.security.models;
 
-import com.tplate.user.User;
+import com.tplate.users.models.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

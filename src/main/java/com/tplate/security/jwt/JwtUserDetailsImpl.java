@@ -1,6 +1,6 @@
 package com.tplate.security.jwt;
 
-import com.tplate.user.User;
+import com.tplate.users.models.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;

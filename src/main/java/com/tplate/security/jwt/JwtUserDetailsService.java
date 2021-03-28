@@ -1,7 +1,7 @@
 package com.tplate.security.jwt;
 
-import com.tplate.user.User;
-import com.tplate.user.UserRepository;
+import com.tplate.users.models.User;
+import com.tplate.users.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

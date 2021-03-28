@@ -1,4 +1,4 @@
-package com.tplate.user;
+package com.tplate.users.exceptions;
 
 public class UserProfileException extends Exception {
 

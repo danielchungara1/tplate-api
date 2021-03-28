@@ -1,4 +1,4 @@
-package com.tplate.user;
+package com.tplate.users.dtos;
 
 import lombok.Data;
 import lombok.ToString;
@@ -6,8 +6,10 @@ import lombok.ToString;
 @Data
 @ToString
 public class UserProfileDto {
+
     private String name;
     private String lastname;
     private String email;
     private String telefono;
+
 }

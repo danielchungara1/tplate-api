@@ -1,4 +1,4 @@
-package com.tplate.user;
+package com.tplate.users.models;
 
 import com.tplate.security.rol.Rol;
 import lombok.AllArgsConstructor;
